@@ -53,6 +53,24 @@ func (controller *TaskControllerImpl) Update(writer http.ResponseWriter, request
 	helper.WriteToResponseBody(writer, webResponse)
 }
 
+func (controller *TaskControllerImpl) UpdateStatus(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	taskUpdateRequest := web.TaskUpdateStatusRequest{}
+	helper.ReadFromRequestBody(request, &taskUpdateRequest)
+
+	taskId := params.ByName("taskId")
+	id, err := strconv.Atoi(taskId)
+	helper.PanifIfError(err)
+
+	taskUpdateRequest.Id = id
+	controller.TaskService.UpdateStatus(request.Context(), taskUpdateRequest)
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}
+
 func (controller *TaskControllerImpl) Delete(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	taskId := params.ByName("taskId")
 	id, err := strconv.Atoi(taskId)

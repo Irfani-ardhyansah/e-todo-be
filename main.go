@@ -27,6 +27,7 @@ func main() {
 	router.GET("/api/v1/task/:taskId", taskController.FindById)
 	router.POST("/api/v1/task", taskController.Create)
 	router.PUT("/api/v1/task/:taskId", taskController.Update)
+	router.PUT("/api/v1/task-status/:taskId", taskController.UpdateStatus)
 	router.DELETE("/api/v1/task/:taskId", taskController.Delete)
 
 	router.PanicHandler = exception.ErrorHandler

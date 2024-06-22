@@ -63,6 +63,23 @@ func (service *TaskServiceImpl) Update(ctx context.Context, request web.TaskUpda
 	return helper.ToTaskResponse(task)
 }
 
+func (service *TaskServiceImpl) UpdateStatus(ctx context.Context, request web.TaskUpdateStatusRequest) {
+	err := service.Validate.Struct(request)
+	helper.PanifIfError(err)
+
+	tx, err := service.DB.Begin()
+	helper.PanifIfError(err)
+	defer helper.CommitOrRollback(tx)
+
+	task, err := service.TaskRepository.FindById(ctx, tx, request.Id)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
+
+	task.Status = request.Status 
+	task = service.TaskRepository.Update(ctx, tx, task)
+}
+
 func (service *TaskServiceImpl) Delete(ctx context.Context, taskId int) {
 	tx, err := service.DB.Begin()
 	helper.PanifIfError(err)
