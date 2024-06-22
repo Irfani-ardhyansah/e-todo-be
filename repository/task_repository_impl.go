@@ -15,7 +15,7 @@ func NewTaskRepository() TaskRepository {
 }
 
 func (repository *TaskRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, task domain.Task) domain.Task {
-	SQL := "INSERT INTO task(name, status) values(?, ?)"
+	SQL := "INSERT INTO tasks(name, status) values(?, ?)"
 	result, err := tx.ExecContext(ctx, SQL, task.Name, task.Status)
 	helper.PanifIfError(err)
 
@@ -27,7 +27,7 @@ func (repository *TaskRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, task
 }
 
 func (repository *TaskRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, task domain.Task) domain.Task {
-	SQL := "UPDATE task SET name = ?, status = ? WHERE id = ?"
+	SQL := "UPDATE tasks SET name = ?, status = ? WHERE id = ?"
 	_, err := tx.ExecContext(ctx, SQL, task.Name, task.Status, task.Id)
 	helper.PanifIfError(err)
 
@@ -35,13 +35,13 @@ func (repository *TaskRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, ta
 }
 
 func (repository *TaskRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, task domain.Task) {
-	SQL := "DELETE FROM task WHERE id = ?"
+	SQL := "DELETE FROM tasks WHERE id = ?"
 	_, err := tx.ExecContext(ctx, SQL, task.Id)
 	helper.PanifIfError(err)
 }
 
 func (repository *TaskRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, taskId int) (domain.Task, error) {
-	SQL := "SELECT id, name, status, created_at WHERE id = ?"
+	SQL := "SELECT id, name, status, created_at FROM tasks WHERE id = ?"
 	rows, err := tx.QueryContext(ctx, SQL, taskId)
 	helper.PanifIfError(err)
 	defer rows.Close()
@@ -57,7 +57,7 @@ func (repository *TaskRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, 
 }
 
 func (repository *TaskRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.Task {
-	SQL := "SELECT id, name, status, created_at"
+	SQL := "SELECT id, name, status, created_at FROM tasks"
 	rows, err := tx.QueryContext(ctx, SQL)
 	helper.PanifIfError(err)
 	defer rows.Close()
