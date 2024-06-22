@@ -76,7 +76,7 @@ func (service *TaskServiceImpl) UpdateStatus(ctx context.Context, request web.Ta
 		panic(exception.NewNotFoundError(err.Error()))
 	}
 
-	task.Status = request.Status 
+	task.Status = request.Status
 	task = service.TaskRepository.Update(ctx, tx, task)
 }
 

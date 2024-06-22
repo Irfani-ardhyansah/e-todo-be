@@ -11,7 +11,7 @@ import (
 
 type TaskRepositoryImpl struct{}
 
-var currentTime = time.Now().Format("2006-01-02 15:04:05")
+var currentTimeTask = time.Now().Format("2006-01-02 15:04:05")
 
 func NewTaskRepository() TaskRepository {
 	return &TaskRepositoryImpl{}
@@ -19,14 +19,14 @@ func NewTaskRepository() TaskRepository {
 
 func (repository *TaskRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, task domain.Task) domain.Task {
 	SQL := "INSERT INTO tasks(name, status, created_at) values(?, ?, ?)"
-	result, err := tx.ExecContext(ctx, SQL, task.Name, task.Status, currentTime)
+	result, err := tx.ExecContext(ctx, SQL, task.Name, task.Status, currentTimeTask)
 	helper.PanifIfError(err)
 
 	id, err := result.LastInsertId()
 	helper.PanifIfError(err)
 
 	task.Id = int(id)
-	task.CreatedAt = currentTime
+	task.CreatedAt = currentTimeTask
 	return task
 }
 

@@ -30,6 +30,9 @@ func main() {
 	router.PUT("/api/v1/task-status/:taskId", taskController.UpdateStatus)
 	router.DELETE("/api/v1/task/:taskId", taskController.Delete)
 
+	// router.POST("/api/v1/timer/start/:taskId")
+	// router.POST("/api/v1/timer/stop/:taskId")
+
 	router.PanicHandler = exception.ErrorHandler
 
 	server := http.Server{

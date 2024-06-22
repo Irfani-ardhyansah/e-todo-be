@@ -16,9 +16,19 @@ func ToTaskResponse(task domain.Task) web.TaskResponse {
 
 func ToTaskResponses(tasks []domain.Task) []web.TaskResponse {
 	var taskResponses []web.TaskResponse
-	for _,task := range tasks {
+	for _, task := range tasks {
 		taskResponses = append(taskResponses, ToTaskResponse(task))
 	}
 
 	return taskResponses
+}
+
+func ToTimerResponse(timer domain.Timer) web.TimerResponse {
+	return web.TimerResponse{
+		Id:        timer.Id,
+		TaskId:    timer.TaskId,
+		Time:      timer.Time,
+		Status:    timer.Status,
+		CreatedAt: timer.CreatedAt,
+	}
 }
