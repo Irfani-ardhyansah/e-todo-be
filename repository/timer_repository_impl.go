@@ -17,7 +17,7 @@ func NewTimerRepository() TimerRepository {
 }
 
 func (repository *TimerRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, timer domain.Timer) domain.Timer {
-	SQL := "INSERT INTO timer(task_id, timer, status, created_at) values(?, ?, ?, ?)"
+	SQL := "INSERT INTO timers(task_id, timer, status, created_at) values(?, ?, ?, ?)"
 	result, err := tx.ExecContext(ctx, SQL, timer.TaskId, timer.Time, timer.Status, currentTimeTask)
 	helper.PanifIfError(err)
 

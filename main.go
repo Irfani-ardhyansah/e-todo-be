@@ -22,6 +22,10 @@ func main() {
 	taskService := service.NewTaskService(taskRespository, db, validate)
 	taskController := controller.NewTaskController(taskService)
 
+	timerRepository := repository.NewTimerRepository()
+	timerService := service.NewTimerService(timerRepository, db, validate)
+	timerController := controller.NewTimerController(timerService)
+
 	router := httprouter.New()
 	router.GET("/api/v1/tasks", taskController.FindAll)
 	router.GET("/api/v1/task/:taskId", taskController.FindById)
@@ -30,7 +34,7 @@ func main() {
 	router.PUT("/api/v1/task-status/:taskId", taskController.UpdateStatus)
 	router.DELETE("/api/v1/task/:taskId", taskController.Delete)
 
-	// router.POST("/api/v1/timer/start/:taskId")
+	router.POST("/api/v1/timer/start/:taskId", timerController.Create)
 	// router.POST("/api/v1/timer/stop/:taskId")
 
 	router.PanicHandler = exception.ErrorHandler
