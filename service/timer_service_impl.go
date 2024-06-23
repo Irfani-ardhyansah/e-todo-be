@@ -33,13 +33,32 @@ func (service *TimerServiceImpl) Start(ctx context.Context, request web.TimerCre
 	helper.PanifIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	task := domain.Timer{
+	timer := domain.Timer{
 		TaskId: request.TaskId,
 		Time:   request.Time,
 		Status: request.Status,
 	}
 
-	task = service.TimerRepository.Save(ctx, tx, task)
+	timer = service.TimerRepository.Save(ctx, tx, timer)
 
-	return helper.ToTimerResponse(task)
+	return helper.ToTimerResponse(timer)
+}
+
+func (service *TimerServiceImpl) Update(ctx context.Context, request web.TimerUpdateRequest) web.TimerResponse {
+	err := service.Validate.Struct(request)
+	helper.PanifIfError(err)
+
+	tx, err := service.DB.Begin()
+	helper.PanifIfError(err)
+	defer helper.CommitOrRollback(tx)
+
+	timer := domain.Timer{
+		Id:     request.Id,
+		Time:   request.Time,
+		Status: request.Status,
+	}
+
+	timer = service.TimerRepository.Update(ctx, tx, timer)
+
+	return helper.ToTimerResponse(timer)
 }

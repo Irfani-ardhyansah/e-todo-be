@@ -38,3 +38,22 @@ func (controller *TimerControllerImpl) Create(writer http.ResponseWriter, reques
 
 	helper.WriteToResponseBody(writer, webResponse)
 }
+
+func (controller *TimerControllerImpl) Update(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	timerUpdateRequest := web.TimerUpdateRequest{}
+	helper.ReadFromRequestBody(request, &timerUpdateRequest)
+
+	timerId := params.ByName("timerId")
+	id, err := strconv.Atoi(timerId)
+	helper.PanifIfError(err)
+
+	timerUpdateRequest.Id = id
+	timerResponse := controller.TimerService.Update(request.Context(), timerUpdateRequest)
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   timerResponse,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}

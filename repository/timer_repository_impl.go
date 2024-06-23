@@ -28,3 +28,11 @@ func (repository *TimerRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, tim
 	timer.CreatedAt = currentTimeTask
 	return timer
 }
+
+func (repository *TimerRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, timer domain.Timer) domain.Timer {
+	SQL := "UPDATE timers SET timer = ?, status = ? WHERE id = ?"
+	_, err := tx.ExecContext(ctx, SQL, timer.Time, timer.Status, timer.Id)
+	helper.PanifIfError(err)
+
+	return timer
+}

@@ -6,5 +6,6 @@ import (
 )
 
 type TimerService interface {
-	Start(ctx context.Context, task web.TimerCreateRequest) web.TimerResponse
+	Start(ctx context.Context, timer web.TimerCreateRequest) web.TimerResponse
+	Update(ctx context.Context, imer web.TimerUpdateRequest) web.TimerResponse
 }

@@ -8,4 +8,5 @@ import (
 
 type TimerRepository interface {
 	Save(ctx context.Context, tx *sql.Tx, timer domain.Timer) domain.Timer
+	Update(ctx context.Context, tx *sql.Tx, timer domain.Timer) domain.Timer
 }
