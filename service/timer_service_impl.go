@@ -12,16 +12,18 @@ import (
 )
 
 type TimerServiceImpl struct {
-	TimerRepository repository.TimerRepository
-	DB              *sql.DB
-	Validate        *validator.Validate
+	TimerRepository         repository.TimerRepository
+	DB                      *sql.DB
+	Validate                *validator.Validate
+	TimerHistoryReposeitory repository.TimerHistoryRepository
 }
 
 func NewTimerService(timerRepository repository.TimerRepository, DB *sql.DB, validate *validator.Validate) TimerService {
 	return &TimerServiceImpl{
-		TimerRepository: timerRepository,
-		DB:              DB,
-		Validate:        validate,
+		TimerRepository:         timerRepository,
+		DB:                      DB,
+		Validate:                validate,
+		TimerHistoryReposeitory: repository.NewTimerHistoryRepository(),
 	}
 }
 
@@ -59,6 +61,14 @@ func (service *TimerServiceImpl) Update(ctx context.Context, request web.TimerUp
 	}
 
 	timer = service.TimerRepository.Update(ctx, tx, timer)
+
+	timerHistory := domain.TimerHistory{
+		TimerId: request.Id,
+		TimeLog: request.Time,
+		Status:  request.Status,
+	}
+
+	service.TimerHistoryReposeitory.Save(ctx, tx, timerHistory)
 
 	return helper.ToTimerResponse(timer)
 }

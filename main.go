@@ -35,7 +35,7 @@ func main() {
 	router.DELETE("/api/v1/task/:taskId", taskController.Delete)
 
 	router.POST("/api/v1/timer/start/:taskId", timerController.Create)
-	router.PUT("/api/v1/timer/stop/:timerId", timerController.Update)
+	router.PUT("/api/v1/timer/update/:timerId", timerController.Update)
 
 	router.PanicHandler = exception.ErrorHandler
 
