@@ -22,8 +22,12 @@ func main() {
 	taskService := service.NewTaskService(taskRespository, db, validate)
 	taskController := controller.NewTaskController(taskService)
 
+	timerHistoryRepository := repository.NewTimerHistoryRepository()
+	timerHistoryService := service.NewTimerHistoryService(timerHistoryRepository, db, validate)
+	timerHistoryController := controller.NewTimerHistoryController(timerHistoryService)
+
 	timerRepository := repository.NewTimerRepository()
-	timerService := service.NewTimerService(timerRepository, db, validate)
+	timerService := service.NewTimerService(timerRepository, db, validate, timerHistoryRepository)
 	timerController := controller.NewTimerController(timerService)
 
 	router := httprouter.New()
@@ -36,6 +40,8 @@ func main() {
 
 	router.POST("/api/v1/timer/start/:taskId", timerController.Create)
 	router.PUT("/api/v1/timer/update/:timerId", timerController.Update)
+
+	router.GET("/api/v1/timer/history/:timerId", timerHistoryController.ListByTimer)
 
 	router.PanicHandler = exception.ErrorHandler
 

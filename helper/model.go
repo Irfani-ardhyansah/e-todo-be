@@ -32,3 +32,13 @@ func ToTimerResponse(timer domain.Timer) web.TimerResponse {
 		CreatedAt: timer.CreatedAt,
 	}
 }
+
+func ToRelationTimerHistoriesResponse(timerHistories domain.RelationTimerHistories) web.RelationTimerHistoriesResponse {
+	return web.RelationTimerHistoriesResponse{
+		Id:        timerHistories.Id,
+		TaskId:    timerHistories.TaskId,
+		Time:      timerHistories.Time,
+		Status:    timerHistories.Status,
+		Histories: timerHistories.Histories,
+	}
+}
