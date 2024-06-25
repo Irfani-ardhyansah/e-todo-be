@@ -3,7 +3,6 @@ package main
 import (
 	"e-todo/app"
 	"e-todo/controller"
-	exception "e-todo/excception"
 	"e-todo/helper"
 	"e-todo/middleware"
 	"e-todo/repository"
@@ -12,7 +11,6 @@ import (
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/julienschmidt/httprouter"
 )
 
 func main() {
@@ -30,20 +28,7 @@ func main() {
 	timerService := service.NewTimerService(timerRepository, db, validate, timerHistoryRepository)
 	timerController := controller.NewTimerController(timerService)
 
-	router := httprouter.New()
-	router.GET("/api/v1/tasks", taskController.FindAll)
-	router.GET("/api/v1/task/:taskId", taskController.FindById)
-	router.POST("/api/v1/task", taskController.Create)
-	router.PUT("/api/v1/task/:taskId", taskController.Update)
-	router.PUT("/api/v1/task-status/:taskId", taskController.UpdateStatus)
-	router.DELETE("/api/v1/task/:taskId", taskController.Delete)
-
-	router.POST("/api/v1/timer/start/:taskId", timerController.Create)
-	router.PUT("/api/v1/timer/update/:timerId", timerController.Update)
-
-	router.GET("/api/v1/timer/history/:timerId", timerHistoryController.ListByTimer)
-
-	router.PanicHandler = exception.ErrorHandler
+	router := app.NewRouter(taskController, timerController, timerHistoryController)
 
 	server := http.Server{
 		Addr:    "localhost:8080",
