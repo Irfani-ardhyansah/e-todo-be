@@ -42,3 +42,12 @@ func ToRelationTimerHistoriesResponse(timerHistories domain.RelationTimerHistori
 		Histories: timerHistories.Histories,
 	}
 }
+
+func ToUserResponse(user domain.User) web.UserResponse {
+	return web.UserResponse{
+		Id:        user.Id,
+		Email:     user.Email,
+		Password:  user.Password,
+		CreatedAt: user.CreatedAt,
+	}
+}

@@ -7,7 +7,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func NewRouter(taskController controller.TaskController, timerController controller.TimerController, timerHistoryController controller.TimerHistoryController) *httprouter.Router {
+func NewRouter(taskController controller.TaskController, timerController controller.TimerController, timerHistoryController controller.TimerHistoryController, userController controller.UserController) *httprouter.Router {
 	router := httprouter.New()
 	router.GET("/api/v1/tasks", taskController.FindAll)
 	router.GET("/api/v1/task/:taskId", taskController.FindById)
@@ -20,6 +20,8 @@ func NewRouter(taskController controller.TaskController, timerController control
 	router.PUT("/api/v1/timer/update/:timerId", timerController.Update)
 
 	router.GET("/api/v1/timer/history/:timerId", timerHistoryController.ListByTimer)
+
+	router.POST("/api/v1/user/create", userController.Create)
 
 	router.PanicHandler = exception.ErrorHandler
 

@@ -28,7 +28,11 @@ func main() {
 	timerService := service.NewTimerService(timerRepository, db, validate, timerHistoryRepository)
 	timerController := controller.NewTimerController(timerService)
 
-	router := app.NewRouter(taskController, timerController, timerHistoryController)
+	userRepository := repository.NewUserRepository()
+	userService := service.NewUserService(userRepository, db, validate)
+	userController := controller.NewUserController(userService)
+
+	router := app.NewRouter(taskController, timerController, timerHistoryController, userController)
 
 	server := http.Server{
 		Addr:    "localhost:8080",
