@@ -23,6 +23,8 @@ func NewRouter(taskController controller.TaskController, timerController control
 
 	router.POST("/api/v1/user/create", userController.Create)
 
+	router.POST("/api/v1/user/login", userController.Login)
+
 	router.PanicHandler = exception.ErrorHandler
 
 	return router

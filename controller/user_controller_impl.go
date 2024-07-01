@@ -32,3 +32,17 @@ func (controller *UserControllerImpl) Create(writer http.ResponseWriter, request
 
 	helper.WriteToResponseBody(writer, webResponse)
 }
+
+func (controller *UserControllerImpl) Login(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	userCreateRequest := web.UserCreateRequest{}
+	helper.ReadFromRequestBody(request, &userCreateRequest)
+
+	userResponse := controller.UserService.Login(request.Context(), userCreateRequest)
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   userResponse,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}

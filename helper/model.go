@@ -51,3 +51,11 @@ func ToUserResponse(user domain.User) web.UserResponse {
 		CreatedAt: user.CreatedAt,
 	}
 }
+
+func ToUserLoginResponse(user domain.User) web.UserLoginResponse {
+	return web.UserLoginResponse{
+		Id:    user.Id,
+		Email: user.Email,
+		Token: user.Token,
+	}
+}
