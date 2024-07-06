@@ -4,6 +4,7 @@ import (
 	"e-todo/helper"
 	"e-todo/model/web"
 	"e-todo/service"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -107,6 +108,10 @@ func (controller *TaskControllerImpl) FindAll(writer http.ResponseWriter, reques
 		Status: "OK",
 		Data:   taskResponses,
 	}
+
+	userClaims := helper.UserClaims(request)
+
+	fmt.Println(userClaims["id"])
 
 	helper.WriteToResponseBody(writer, webResponse)
 }

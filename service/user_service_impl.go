@@ -8,10 +8,9 @@ import (
 	"e-todo/model/domain"
 	"e-todo/model/web"
 	"e-todo/repository"
-	"errors"
+	"time"
 
 	"github.com/go-playground/validator/v10"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type UserServiceImpl struct {
@@ -28,26 +27,6 @@ func NewUserService(userRepository repository.UserRepository, DB *sql.DB, valida
 	}
 }
 
-func getHashPassword(password string) (string, error) {
-	bytePassword := []byte(password)
-	hash, err := bcrypt.GenerateFromPassword(bytePassword, bcrypt.DefaultCost)
-	if err != nil {
-		return "", err
-	}
-
-	return string(hash), err
-}
-
-func checkPassword(hashPassword, password string) (bool, error) {
-	err := bcrypt.CompareHashAndPassword([]byte(hashPassword), []byte(password))
-
-	if err != nil {
-		return true, errors.New("Password Is Not Match")
-	}
-
-	return false, nil
-}
-
 func (service *UserServiceImpl) Create(ctx context.Context, request web.UserCreateRequest) web.UserResponse {
 	err := service.Validate.Struct(request)
 	helper.PanifIfError(err)
@@ -56,7 +35,7 @@ func (service *UserServiceImpl) Create(ctx context.Context, request web.UserCrea
 	helper.PanifIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	hashPassword, err := getHashPassword(request.Password)
+	hashPassword, err := helper.GetHashPassword(request.Password)
 	helper.PanifIfError(err)
 
 	user := domain.User{
@@ -78,10 +57,14 @@ func (service *UserServiceImpl) Login(ctx context.Context, request web.UserCreat
 		panic(exception.NewNotFoundError(err.Error()))
 	}
 
-	errCheckPass, err := checkPassword(user.Password, request.Password)
+	errCheckPass, err := helper.CheckPassword(user.Password, request.Password)
 	if errCheckPass {
 		panic(exception.NewBadRequestError(err.Error()))
 	}
+
+	expTime := time.Now().Add(time.Minute * 30)
+	jwtToken := helper.GenereateJwtToken(expTime, user.Id, user.Email)
+	user.Token = jwtToken
 
 	return helper.ToUserLoginResponse(user)
 }
