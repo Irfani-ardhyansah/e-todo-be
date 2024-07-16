@@ -6,6 +6,7 @@ import (
 	"e-todo/helper"
 	"e-todo/model/domain"
 	"errors"
+	"fmt"
 	"time"
 )
 
@@ -43,5 +44,32 @@ func (repository *UserRepositoryImpl) FindByEmail(ctx context.Context, db *sql.D
 		return user, nil
 	} else {
 		return user, errors.New("User Not Found")
+	}
+}
+
+func (repository *UserRepositoryImpl) SaveToken(ctx context.Context, tx *sql.Tx, userToken domain.UserToken) error {
+	SQL := "INSERT INTO user_tokens(user_id, refresh_token, is_valid) values(?, ?, ?)"
+	_, err := tx.ExecContext(ctx, SQL, userToken.UserId, userToken.RefreshToken, userToken.IsValid)
+
+	if err != nil {
+		return err
+	} else {
+		return nil
+	}
+}
+
+func (repository *UserRepositoryImpl) CheckValidToken(ctx context.Context, db *sql.DB, userId int) bool {
+	SQL := "SELECT is_valid FROM user_tokens WHERE user_id = ?"
+	rows, err := db.Query(SQL, userId)
+
+	fmt.Println(rows)
+
+	helper.PanifIfError(err)
+	defer rows.Close()
+
+	if rows.Next() {
+		return true
+	} else {
+		return false
 	}
 }

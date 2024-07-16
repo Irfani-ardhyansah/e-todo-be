@@ -62,9 +62,28 @@ func (service *UserServiceImpl) Login(ctx context.Context, request web.UserCreat
 		panic(exception.NewBadRequestError(err.Error()))
 	}
 
-	expTime := time.Now().Add(time.Minute * 30)
-	jwtToken := helper.GenereateJwtToken(expTime, user.Id, user.Email)
-	user.Token = jwtToken
+	expAccessTime := time.Now().Add(time.Minute * 30)
+	jwtAccessToken := helper.GenereateJwtToken(expAccessTime, user.Id, user.Email)
+	user.AccessToken = jwtAccessToken
+
+	expResfreshTime := time.Now().Add(time.Hour * 2)
+	jwtRefreshToken := helper.GenereateJwtToken(expResfreshTime, user.Id, user.Email)
+	user.RefreshToken = jwtRefreshToken
+
+	userToken := domain.UserToken{
+		UserId:       user.Id,
+		RefreshToken: user.RefreshToken,
+		IsValid:      1,
+	}
+
+	tx, err := service.DB.Begin()
+	helper.PanifIfError(err)
+	defer helper.CommitOrRollback(tx)
+
+	errorUserToken := service.UserRepository.SaveToken(ctx, tx, userToken)
+	if errorUserToken != nil {
+		helper.PanifIfError(errorUserToken)
+	}
 
 	return helper.ToUserLoginResponse(user)
 }

@@ -5,5 +5,6 @@ type User struct {
 	Email     string
 	Password  string
 	CreatedAt string
-	Token     string
+	RefreshToken     string
+	AccessToken     string
 }

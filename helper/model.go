@@ -54,8 +54,9 @@ func ToUserResponse(user domain.User) web.UserResponse {
 
 func ToUserLoginResponse(user domain.User) web.UserLoginResponse {
 	return web.UserLoginResponse{
-		Id:    user.Id,
-		Email: user.Email,
-		Token: user.Token,
+		Id:           user.Id,
+		Email:        user.Email,
+		AccessToken:  user.AccessToken,
+		RefreshToken: user.RefreshToken,
 	}
 }

@@ -43,17 +43,24 @@ func GenereateJwtToken(expTime time.Time, id int, email string) string {
 
 	tokenAlgo := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	token, err := tokenAlgo.SignedString(config.JWT_KEY)
+	token, err := tokenAlgo.SignedString(config.ACCESS_KEY)
 	PanifIfError(err)
 
 	return token
 }
 
-func VerifyToken(tokenString string) (jwt.MapClaims, error) {
+func VerifyToken(tokenString string, typeToken string) (jwt.MapClaims, error) {
+
+	var key string
+	if typeToken == "access" {
+		key = string(config.ACCESS_KEY)
+	} else if typeToken == "refresh" {
+		key = string(config.REFRESH_KEY)
+	}
 
 	claims := jwt.MapClaims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-		return config.JWT_KEY, nil
+		return key, nil
 	})
 
 	if err != nil {
