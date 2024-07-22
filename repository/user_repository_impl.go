@@ -6,7 +6,6 @@ import (
 	"e-todo/helper"
 	"e-todo/model/domain"
 	"errors"
-	"fmt"
 	"time"
 )
 
@@ -47,6 +46,22 @@ func (repository *UserRepositoryImpl) FindByEmail(ctx context.Context, db *sql.D
 	}
 }
 
+func (repository *UserRepositoryImpl) FindById(ctx context.Context, db *sql.DB, userId int) (domain.User, error) {
+	SQL := "SELECT id, email, password FROM users WHERE id = ?"
+	rows, err := db.Query(SQL, userId)
+	helper.PanifIfError(err)
+	defer rows.Close()
+
+	user := domain.User{}
+	if rows.Next() {
+		err := rows.Scan(&user.Id, &user.Email, &user.Password)
+		helper.PanifIfError(err)
+		return user, nil
+	} else {
+		return user, errors.New("User Not Found")
+	}
+}
+
 func (repository *UserRepositoryImpl) SaveToken(ctx context.Context, tx *sql.Tx, userToken domain.UserToken) error {
 	SQL := "INSERT INTO user_tokens(user_id, refresh_token, is_valid) values(?, ?, ?)"
 	_, err := tx.ExecContext(ctx, SQL, userToken.UserId, userToken.RefreshToken, userToken.IsValid)
@@ -58,11 +73,9 @@ func (repository *UserRepositoryImpl) SaveToken(ctx context.Context, tx *sql.Tx,
 	}
 }
 
-func (repository *UserRepositoryImpl) CheckValidToken(ctx context.Context, db *sql.DB, userId int) bool {
-	SQL := "SELECT is_valid FROM user_tokens WHERE user_id = ?"
-	rows, err := db.Query(SQL, userId)
-
-	fmt.Println(rows)
+func (repository *UserRepositoryImpl) CheckValidToken(ctx context.Context, db *sql.DB, userId int, refreshToken string) bool {
+	SQL := "SELECT is_valid FROM user_tokens WHERE user_id = ? AND refresh_token = ?"
+	rows, err := db.Query(SQL, userId, refreshToken)
 
 	helper.PanifIfError(err)
 	defer rows.Close()

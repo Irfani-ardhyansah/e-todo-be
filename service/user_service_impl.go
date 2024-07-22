@@ -8,6 +8,7 @@ import (
 	"e-todo/model/domain"
 	"e-todo/model/web"
 	"e-todo/repository"
+	"errors"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -63,11 +64,11 @@ func (service *UserServiceImpl) Login(ctx context.Context, request web.UserCreat
 	}
 
 	expAccessTime := time.Now().Add(time.Minute * 30)
-	jwtAccessToken := helper.GenereateJwtToken(expAccessTime, user.Id, user.Email)
+	jwtAccessToken := helper.GenereateJwtToken(expAccessTime, user.Id, user.Email, "access")
 	user.AccessToken = jwtAccessToken
 
 	expResfreshTime := time.Now().Add(time.Hour * 2)
-	jwtRefreshToken := helper.GenereateJwtToken(expResfreshTime, user.Id, user.Email)
+	jwtRefreshToken := helper.GenereateJwtToken(expResfreshTime, user.Id, user.Email, "refresh")
 	user.RefreshToken = jwtRefreshToken
 
 	userToken := domain.UserToken{
@@ -84,6 +85,28 @@ func (service *UserServiceImpl) Login(ctx context.Context, request web.UserCreat
 	if errorUserToken != nil {
 		helper.PanifIfError(errorUserToken)
 	}
+
+	return helper.ToUserLoginResponse(user)
+}
+
+func (service *UserServiceImpl) RefreshToken(ctx context.Context, userId int, refreshToken string) web.UserLoginResponse {
+	validRefreshToken := service.UserRepository.CheckValidToken(ctx, service.DB, userId, refreshToken)
+	if !validRefreshToken {
+		panic(errors.New("Token Data Is Not Valid From DB"))
+	}
+
+	_, err := helper.VerifyToken(refreshToken, "refresh")
+	if err != nil {
+		helper.PanifIfError(err)
+	}
+
+	user, err := service.UserRepository.FindById(ctx, service.DB, userId)
+
+	expAccessTime := time.Now().Add(time.Minute * 30)
+	jwtAccessToken := helper.GenereateJwtToken(expAccessTime, user.Id, user.Email, "access")
+	user.AccessToken = jwtAccessToken
+
+	user.RefreshToken = refreshToken
 
 	return helper.ToUserLoginResponse(user)
 }

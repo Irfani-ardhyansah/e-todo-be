@@ -3,7 +3,6 @@ package helper
 import (
 	"e-todo/config"
 	"errors"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -31,7 +30,7 @@ func CheckPassword(hashPassword, password string) (bool, error) {
 	return false, nil
 }
 
-func GenereateJwtToken(expTime time.Time, id int, email string) string {
+func GenereateJwtToken(expTime time.Time, id int, email string, typeToken string) string {
 	claims := &config.JWTClaim{
 		Id:    id,
 		Email: email,
@@ -41,9 +40,16 @@ func GenereateJwtToken(expTime time.Time, id int, email string) string {
 		},
 	}
 
+	var key []byte
+	if typeToken == "access" {
+		key = config.ACCESS_KEY
+	} else if typeToken == "refresh" {
+		key = config.REFRESH_KEY
+	}
+
 	tokenAlgo := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	token, err := tokenAlgo.SignedString(config.ACCESS_KEY)
+	token, err := tokenAlgo.SignedString(key)
 	PanifIfError(err)
 
 	return token
@@ -51,11 +57,11 @@ func GenereateJwtToken(expTime time.Time, id int, email string) string {
 
 func VerifyToken(tokenString string, typeToken string) (jwt.MapClaims, error) {
 
-	var key string
+	var key []byte
 	if typeToken == "access" {
-		key = string(config.ACCESS_KEY)
+		key = config.ACCESS_KEY
 	} else if typeToken == "refresh" {
-		key = string(config.REFRESH_KEY)
+		key = config.REFRESH_KEY
 	}
 
 	claims := jwt.MapClaims{}
@@ -68,7 +74,7 @@ func VerifyToken(tokenString string, typeToken string) (jwt.MapClaims, error) {
 	}
 
 	if !token.Valid {
-		return nil, fmt.Errorf("invalid token")
+		return nil, errors.New("Token Is Not Valid")
 	}
 
 	return claims, nil
@@ -77,7 +83,7 @@ func VerifyToken(tokenString string, typeToken string) (jwt.MapClaims, error) {
 func UserClaims(request *http.Request) jwt.MapClaims {
 	claims, ok := request.Context().Value("jwtClaims").(jwt.MapClaims)
 	if !ok {
-		fmt.Println("Missing claims in context")
+		errors.New("Missing claims in context")
 	}
 
 	return claims
