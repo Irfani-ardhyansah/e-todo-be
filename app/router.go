@@ -5,6 +5,7 @@ import (
 	"e-todo/controller"
 	exception "e-todo/excception"
 	"e-todo/helper"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -39,6 +40,7 @@ func jwtMiddleware(next httprouter.Handle) httprouter.Handle {
 }
 
 func NewRouter(taskController controller.TaskController, timerController controller.TimerController, timerHistoryController controller.TimerHistoryController, userController controller.UserController) *httprouter.Router {
+	fmt.Println("NewRouter")
 	router := httprouter.New()
 	router.GET("/api/v1/tasks", jwtMiddleware(taskController.FindAll))
 	router.GET("/api/v1/task/:taskId", taskController.FindById)
