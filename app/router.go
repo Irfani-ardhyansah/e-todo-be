@@ -39,26 +39,25 @@ func jwtMiddleware(next httprouter.Handle) httprouter.Handle {
 	}
 }
 
-func NewRouter(taskController controller.TaskController, timerController controller.TimerController, timerHistoryController controller.TimerHistoryController, userController controller.UserController) *httprouter.Router {
+func NewRouter(taskController controller.TaskController, timerController controller.TimerController, timerHistoryController controller.TimerHistoryController, userController controller.UserController, authController controller.AuthController) *httprouter.Router {
 	fmt.Println("NewRouter")
 	router := httprouter.New()
 	router.GET("/api/v1/tasks", jwtMiddleware(taskController.FindAll))
-	router.GET("/api/v1/task/:taskId", taskController.FindById)
-	router.POST("/api/v1/task", taskController.Create)
-	router.PUT("/api/v1/task/:taskId", taskController.Update)
-	router.PUT("/api/v1/task-status/:taskId", taskController.UpdateStatus)
-	router.DELETE("/api/v1/task/:taskId", taskController.Delete)
+	router.GET("/api/v1/task/:taskId", jwtMiddleware(taskController.FindById))
+	router.POST("/api/v1/task", jwtMiddleware(taskController.Create))
+	router.PUT("/api/v1/task/:taskId", jwtMiddleware(taskController.Update))
+	router.PUT("/api/v1/task-status/:taskId", jwtMiddleware(taskController.UpdateStatus))
+	router.DELETE("/api/v1/task/:taskId", jwtMiddleware(taskController.Delete))
 
-	router.POST("/api/v1/timer/start/:taskId", timerController.Create)
-	router.PUT("/api/v1/timer/update/:timerId", timerController.Update)
+	router.POST("/api/v1/timer/start/:taskId", jwtMiddleware(timerController.Create))
+	router.PUT("/api/v1/timer/update/:timerId", jwtMiddleware(timerController.Update))
 
-	router.GET("/api/v1/timer/history/:timerId", timerHistoryController.ListByTimer)
+	router.GET("/api/v1/timer/history/:timerId", jwtMiddleware(timerHistoryController.ListByTimer))
 
-	router.POST("/api/v1/user/create", userController.Create)
+	router.POST("/api/v1/user/create", jwtMiddleware(userController.Create))
 
-	router.POST("/api/v1/user/login", userController.Login)
-
-	router.POST("/api/v1/user/refresh-token/:userId", userController.RefreshToken)
+	router.POST("/api/v1/user/login", authController.Login)
+	router.POST("/api/v1/user/refresh-token/:userId", jwtMiddleware(authController.RefreshToken))
 
 	router.PanicHandler = exception.ErrorHandler
 

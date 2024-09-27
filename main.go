@@ -32,7 +32,11 @@ func main() {
 	userService := service.NewUserService(userRepository, db, validate)
 	userController := controller.NewUserController(userService)
 
-	router := app.NewRouter(taskController, timerController, timerHistoryController, userController)
+	authRespository := repository.NewAuthRepository()
+	authService := service.NewAuthService(authRespository, userRepository, db, validate)
+	authController := controller.NewAuthController(authService)
+
+	router := app.NewRouter(taskController, timerController, timerHistoryController, userController, authController)
 
 	server := http.Server{
 		Addr:    "localhost:8080",
