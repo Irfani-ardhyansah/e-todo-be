@@ -29,8 +29,7 @@ func jwtMiddleware(next httprouter.Handle) httprouter.Handle {
 
 		claims, err := helper.VerifyToken(token, "access")
 		if err != nil {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			return
+			panic(exception.NewUnauthorizedError(err.Error()))
 		}
 
 		ctx := context.WithValue(r.Context(), "jwtClaims", claims)
