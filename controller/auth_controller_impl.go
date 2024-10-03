@@ -6,8 +6,6 @@ import (
 	"e-todo/service"
 	"fmt"
 	"net/http"
-	"strconv"
-	"strings"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -25,6 +23,7 @@ func NewAuthController(authService service.AuthService) AuthController {
 func (controller *AuthControllerImpl) Login(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	authCreateRequest := web.UserCreateRequest{}
 	helper.ReadFromRequestBody(request, &authCreateRequest)
+	fmt.Println(authCreateRequest)
 
 	authResponse := controller.AuthService.Login(request.Context(), authCreateRequest)
 	webResponse := web.WebResponse{
@@ -37,24 +36,11 @@ func (controller *AuthControllerImpl) Login(writer http.ResponseWriter, request 
 }
 
 func (controller *AuthControllerImpl) RefreshToken(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	userId := params.ByName("userId")
-	id, err := strconv.Atoi(userId)
-	helper.PanifIfError(err)
+	refreshTokenRequest := web.RefreshTokenRequest{}
+	helper.ReadFromRequestBody(request, &refreshTokenRequest)
+	fmt.Println(refreshTokenRequest)
 
-	authHeader := request.Header.Get("Authorization")
-	if authHeader == "" {
-		http.Error(writer, "Missing Authorization header", http.StatusUnauthorized)
-		return
-	}
-
-	tokenParts := strings.SplitN(authHeader, " ", 2)
-	if len(tokenParts) != 2 || strings.ToLower(tokenParts[0]) != "bearer" {
-		http.Error(writer, "Invalid Authorization header format", http.StatusUnauthorized)
-		return
-	}
-	refreshToken := tokenParts[1]
-
-	refreshTokenResponse := controller.AuthService.RefreshToken(request.Context(), id, refreshToken)
+	refreshTokenResponse := controller.AuthService.RefreshToken(request.Context(), refreshTokenRequest)
 	fmt.Println(refreshTokenResponse)
 	webResponse := web.WebResponse{
 		Code:   200,

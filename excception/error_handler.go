@@ -93,8 +93,8 @@ func unauthorizedError(writer http.ResponseWriter, request *http.Request, err in
 
 		webResponse := web.WebResponse{
 			Code:   http.StatusUnauthorized,
-			Status: "Umauthorized",
-			Data:   exception,
+			Status: "Unauthorized",
+			Data:   exception.Error,
 		}
 
 		helper.WriteToResponseBody(writer, webResponse)

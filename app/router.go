@@ -56,7 +56,7 @@ func NewRouter(taskController controller.TaskController, timerController control
 	router.POST("/api/v1/user/create", jwtMiddleware(userController.Create))
 
 	router.POST("/api/v1/user/login", authController.Login)
-	router.POST("/api/v1/user/refresh-token/:userId", jwtMiddleware(authController.RefreshToken))
+	router.POST("/api/v1/user/refresh-token", authController.RefreshToken)
 
 	router.PanicHandler = exception.ErrorHandler
 

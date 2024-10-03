@@ -10,6 +10,7 @@ import (
 	"e-todo/repository"
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -71,17 +72,26 @@ func (service *AuthServiceImpl) Login(ctx context.Context, request web.UserCreat
 	return helper.ToUserLoginResponse(user)
 }
 
-func (service *AuthServiceImpl) RefreshToken(ctx context.Context, userId int, refreshToken string) web.UserLoginResponse {
+func (service *AuthServiceImpl) RefreshToken(ctx context.Context, request web.RefreshTokenRequest) web.UserLoginResponse {
+	err := service.Validate.Struct(request)
+	helper.PanifIfError(err)
+
+	userId, err := strconv.Atoi(request.UserId)
+	helper.PanifIfError(err)
+	refreshToken := request.RefreshToken
+
 	validRefreshToken := service.AuthRepository.CheckValidToken(ctx, service.DB, userId, refreshToken)
 	fmt.Println(validRefreshToken)
 	if !validRefreshToken {
-		panic(errors.New("Token Data Is NOt Valid From DB"))
+		err := errors.New("Token Data Is NOt Valid From DB")
+		panic(exception.NewUnauthorizedError(err.Error()))
 	}
 
-	_, err := helper.VerifyToken(refreshToken, "refresh")
+	claims, err := helper.VerifyToken(refreshToken, "refresh")
 	if err != nil {
-		helper.PanifIfError(err)
+		panic(exception.NewUnauthorizedError(err.Error()))
 	}
+	fmt.Println(claims)
 
 	user, err := service.UserRepository.FindById(ctx, service.DB, userId)
 
