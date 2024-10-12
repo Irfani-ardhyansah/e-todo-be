@@ -3,6 +3,7 @@ package helper
 import (
 	"e-todo/config"
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -87,4 +88,21 @@ func UserClaims(request *http.Request) jwt.MapClaims {
 	}
 
 	return claims
+}
+
+func ExtractID(claims map[string]interface{}) (int, error) {
+	if idValue, ok := claims["id"]; ok {
+		switch v := idValue.(type) {
+		case float64:
+			return int(v), nil
+		case int:
+			return v, nil
+		case string:
+			return 0, fmt.Errorf("id is a string, conversion not implemented")
+		default:
+			return 0, fmt.Errorf("unexpected type for id: %T", idValue)
+		}
+	}
+
+	return 0, fmt.Errorf("id not found in claims")
 }

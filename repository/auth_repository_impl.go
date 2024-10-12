@@ -29,9 +29,9 @@ func (repository *AuthRepositoryImpl) SaveToken(ctx context.Context, tx *sql.Tx,
 	return nil
 }
 
-func (repository *AuthRepositoryImpl) CheckValidToken(ctx context.Context, db *sql.DB, userId int, refreshToken string) bool {
-	SQL := "SELECT is_valid FROM user_tokens WHERE user_id = ? AND refresh_token = ?"
-	rows, err := db.Query(SQL, userId, refreshToken)
+func (repository *AuthRepositoryImpl) CheckValidToken(ctx context.Context, db *sql.DB, refreshToken string) bool {
+	SQL := "SELECT is_valid FROM user_tokens WHERE refresh_token = ?"
+	rows, err := db.Query(SQL, refreshToken)
 	helper.PanifIfError(err)
 	defer rows.Close()
 

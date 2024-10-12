@@ -4,7 +4,6 @@ import (
 	"e-todo/helper"
 	"e-todo/model/web"
 	"e-todo/service"
-	"fmt"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -23,7 +22,6 @@ func NewAuthController(authService service.AuthService) AuthController {
 func (controller *AuthControllerImpl) Login(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	authCreateRequest := web.UserCreateRequest{}
 	helper.ReadFromRequestBody(request, &authCreateRequest)
-	fmt.Println(authCreateRequest)
 
 	authResponse := controller.AuthService.Login(request.Context(), authCreateRequest)
 	webResponse := web.WebResponse{
@@ -38,10 +36,8 @@ func (controller *AuthControllerImpl) Login(writer http.ResponseWriter, request 
 func (controller *AuthControllerImpl) RefreshToken(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	refreshTokenRequest := web.RefreshTokenRequest{}
 	helper.ReadFromRequestBody(request, &refreshTokenRequest)
-	fmt.Println(refreshTokenRequest)
 
 	refreshTokenResponse := controller.AuthService.RefreshToken(request.Context(), refreshTokenRequest)
-	fmt.Println(refreshTokenResponse)
 	webResponse := web.WebResponse{
 		Code:   200,
 		Status: "OK",

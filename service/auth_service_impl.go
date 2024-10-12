@@ -9,8 +9,6 @@ import (
 	"e-todo/model/web"
 	"e-todo/repository"
 	"errors"
-	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -76,12 +74,9 @@ func (service *AuthServiceImpl) RefreshToken(ctx context.Context, request web.Re
 	err := service.Validate.Struct(request)
 	helper.PanifIfError(err)
 
-	userId, err := strconv.Atoi(request.UserId)
-	helper.PanifIfError(err)
 	refreshToken := request.RefreshToken
 
-	validRefreshToken := service.AuthRepository.CheckValidToken(ctx, service.DB, userId, refreshToken)
-	fmt.Println(validRefreshToken)
+	validRefreshToken := service.AuthRepository.CheckValidToken(ctx, service.DB, refreshToken)
 	if !validRefreshToken {
 		err := errors.New("Token Data Is NOt Valid From DB")
 		panic(exception.NewUnauthorizedError(err.Error()))
@@ -91,9 +86,9 @@ func (service *AuthServiceImpl) RefreshToken(ctx context.Context, request web.Re
 	if err != nil {
 		panic(exception.NewUnauthorizedError(err.Error()))
 	}
-	fmt.Println(claims)
 
-	user, err := service.UserRepository.FindById(ctx, service.DB, userId)
+	userIdInt, _ := helper.ExtractID(claims)
+	user, err := service.UserRepository.FindById(ctx, service.DB, userIdInt)
 
 	expAccessTime := time.Now().Add(time.Minute * 30)
 	jwtAccessToken := helper.GenereateJwtToken(expAccessTime, user.Id, user.Email, "access")

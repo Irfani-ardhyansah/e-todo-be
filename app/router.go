@@ -5,7 +5,7 @@ import (
 	"e-todo/controller"
 	exception "e-todo/excception"
 	"e-todo/helper"
-	"fmt"
+	"errors"
 	"net/http"
 	"strings"
 
@@ -16,14 +16,14 @@ func jwtMiddleware(next httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
-			http.Error(w, "Missing Authorization header", http.StatusUnauthorized)
-			return
+			err := errors.New("Missing Authorization header")
+			panic(exception.NewUnauthorizedError(err.Error()))
 		}
 
 		tokenParts := strings.SplitN(authHeader, " ", 2)
 		if len(tokenParts) != 2 || strings.ToLower(tokenParts[0]) != "bearer" {
-			http.Error(w, "Invalid Authorization header format", http.StatusUnauthorized)
-			return
+			err := errors.New("Invalid Authorization header format")
+			panic(exception.NewUnauthorizedError(err.Error()))
 		}
 		token := tokenParts[1]
 
@@ -39,7 +39,6 @@ func jwtMiddleware(next httprouter.Handle) httprouter.Handle {
 }
 
 func NewRouter(taskController controller.TaskController, timerController controller.TimerController, timerHistoryController controller.TimerHistoryController, userController controller.UserController, authController controller.AuthController) *httprouter.Router {
-	fmt.Println("NewRouter")
 	router := httprouter.New()
 	router.GET("/api/v1/tasks", jwtMiddleware(taskController.FindAll))
 	router.GET("/api/v1/task/:taskId", jwtMiddleware(taskController.FindById))
