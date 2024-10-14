@@ -11,6 +11,7 @@ import (
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/rs/cors"
 )
 
 func main() {
@@ -38,9 +39,18 @@ func main() {
 
 	router := app.NewRouter(taskController, timerController, timerHistoryController, userController, authController)
 
+	corsHandler := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:3000"}, // Change this to your frontend URL
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Authorization", "Content-Type", "X-Api-Key"},
+		AllowCredentials: true,
+	})
+
+	corsRouter := corsHandler.Handler(router)
+
 	server := http.Server{
 		Addr:    "localhost:8080",
-		Handler: middleware.NewAuthMiddleware(router),
+		Handler: middleware.NewAuthMiddleware(corsRouter),
 	}
 
 	err := server.ListenAndServe()

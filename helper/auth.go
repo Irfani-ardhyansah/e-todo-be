@@ -41,12 +41,8 @@ func GenereateJwtToken(expTime time.Time, id int, email string, typeToken string
 		},
 	}
 
-	var key []byte
-	if typeToken == "access" {
-		key = config.ACCESS_KEY
-	} else if typeToken == "refresh" {
-		key = config.REFRESH_KEY
-	}
+	key, err := whetherTypeToken(typeToken)
+	PanifIfError(err)
 
 	tokenAlgo := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
@@ -57,13 +53,8 @@ func GenereateJwtToken(expTime time.Time, id int, email string, typeToken string
 }
 
 func VerifyToken(tokenString string, typeToken string) (jwt.MapClaims, error) {
-
-	var key []byte
-	if typeToken == "access" {
-		key = config.ACCESS_KEY
-	} else if typeToken == "refresh" {
-		key = config.REFRESH_KEY
-	}
+	key, err := whetherTypeToken(typeToken)
+	PanifIfError(err)
 
 	claims := jwt.MapClaims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
@@ -79,6 +70,17 @@ func VerifyToken(tokenString string, typeToken string) (jwt.MapClaims, error) {
 	}
 
 	return claims, nil
+}
+
+func whetherTypeToken(typeToken string) ([]byte, error) {
+	var key []byte
+	if typeToken == "access" {
+		key = config.ACCESS_KEY
+	} else if typeToken == "refresh" {
+		key = config.REFRESH_KEY
+	}
+
+	return key, nil
 }
 
 func UserClaims(request *http.Request) jwt.MapClaims {
