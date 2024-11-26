@@ -10,6 +10,7 @@ func ToTaskResponse(task domain.Task) web.TaskResponse {
 		Id:        task.Id,
 		Name:      task.Name,
 		Status:    task.Status,
+		Code:      task.Code,
 		CreatedAt: task.CreatedAt,
 	}
 }
