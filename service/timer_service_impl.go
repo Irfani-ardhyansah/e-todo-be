@@ -38,6 +38,7 @@ func (service *TimerServiceImpl) Start(ctx context.Context, request web.TimerCre
 	timer := domain.Timer{
 		TaskId: request.TaskId,
 		Time:   request.Time,
+		Title:  request.Title,
 		Status: request.Status,
 	}
 
@@ -65,6 +66,7 @@ func (service *TimerServiceImpl) Update(ctx context.Context, request web.TimerUp
 	timer := domain.Timer{
 		Id:     request.Id,
 		Time:   request.Time,
+		Title: request.Title,
 		Status: request.Status,
 	}
 

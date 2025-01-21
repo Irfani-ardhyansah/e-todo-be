@@ -29,6 +29,7 @@ func ToTimerResponse(timer domain.Timer) web.TimerResponse {
 		Id:        timer.Id,
 		TaskId:    timer.TaskId,
 		Time:      timer.Time,
+		Title:     timer.Title,
 		Status:    timer.Status,
 		CreatedAt: timer.CreatedAt,
 	}

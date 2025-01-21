@@ -17,8 +17,8 @@ func NewTimerRepository() TimerRepository {
 }
 
 func (repository *TimerRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, timer domain.Timer) domain.Timer {
-	SQL := "INSERT INTO timers(task_id, timer, status, created_at) values(?, ?, ?, ?)"
-	result, err := tx.ExecContext(ctx, SQL, timer.TaskId, timer.Time, timer.Status, currentTimeTask)
+	SQL := "INSERT INTO timers(task_id, timer, title, status, created_at) values(?, ?, ?, ?, ?)"
+	result, err := tx.ExecContext(ctx, SQL, timer.TaskId, timer.Time, timer.Title, timer.Status, currentTimeTask)
 	helper.PanifIfError(err)
 
 	id, err := result.LastInsertId()
@@ -30,8 +30,8 @@ func (repository *TimerRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, tim
 }
 
 func (repository *TimerRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, timer domain.Timer) domain.Timer {
-	SQL := "UPDATE timers SET timer = ?, status = ? WHERE id = ?"
-	_, err := tx.ExecContext(ctx, SQL, timer.Time, timer.Status, timer.Id)
+	SQL := "UPDATE timers SET timer = ?, title = ?, status = ? WHERE id = ?"
+	_, err := tx.ExecContext(ctx, SQL, timer.Time, timer.Title, timer.Status, timer.Id)
 	helper.PanifIfError(err)
 
 	return timer
