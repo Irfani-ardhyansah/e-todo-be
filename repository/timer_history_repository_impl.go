@@ -11,21 +11,20 @@ import (
 
 type TimerHistoryRepositoryImpl struct{}
 
-var currentTimeTimerHistory = time.Now().Format("2006-01-02 15:04:05")
-
 func NewTimerHistoryRepository() TimerHistoryRepository {
 	return &TimerHistoryRepositoryImpl{}
 }
 
 func (repository *TimerHistoryRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, timer domain.TimerHistory) {
 	SQL := "INSERT INTO timer_histories(timer_id, time_log, status,  created_at) values(?, ?, ?, ?)"
-	_, err := tx.ExecContext(ctx, SQL, timer.TimerId, timer.TimeLog, timer.Status, currentTimeTimerHistory)
+	currentTime := time.Now().Format("2006-01-02 15:04:05")
+	_, err := tx.ExecContext(ctx, SQL, timer.TimerId, timer.TimeLog, timer.Status, currentTime)
 	helper.PanifIfError(err)
 }
 
 func (repository *TimerHistoryRepositoryImpl) FindByParentId(ctx context.Context, db *sql.DB, timerId int) (domain.RelationTimerHistories, error) {
 	SQL := "SELECT id, task_id, timer, status FROM timers WHERE id = ?"
-	rows, err := db.Query(SQL, timerId)
+	rows, err := db.QueryContext(ctx, SQL, timerId)
 	helper.PanifIfError(err)
 	defer rows.Close()
 
@@ -48,6 +47,26 @@ func (repository *TimerHistoryRepositoryImpl) FindByParentId(ctx context.Context
 
 		return timer, nil
 	} else {
-		return domain.RelationTimerHistories{}, errors.New("Task Is Not Found")
+		return timer, errors.New("Task Is Not Found")
 	}
+}
+
+func (repository *TimerHistoryRepositoryImpl) GetAll(ctx context.Context, db *sql.DB) ([]domain.TaskDetail, error) {
+	SQL := "SELECT tasks.id, name, timer, DATE(tasks.created_at) as date FROM tasks JOIN timers ON tasks.id = timers.task_id"
+	rows, err := db.QueryContext(ctx, SQL)
+	helper.PanifIfError(err)
+	defer rows.Close()
+
+	tasks := []domain.TaskDetail{}
+	for rows.Next() {
+		task := domain.TaskDetail{}
+		var timeString string
+		err := rows.Scan(&task.Id, &task.TaskName, &timeString, &task.Date)
+		task.Time = timeString
+		helper.PanifIfError(err)
+
+		tasks = append(tasks, task)
+	}
+
+	return tasks, err
 }

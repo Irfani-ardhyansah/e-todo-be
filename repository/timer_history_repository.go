@@ -9,4 +9,5 @@ import (
 type TimerHistoryRepository interface {
 	Save(ctx context.Context, tx *sql.Tx, timerHistory domain.TimerHistory)
 	FindByParentId(ctx context.Context, tx *sql.DB, timerId int) (domain.RelationTimerHistories, error)
+	GetAll(ctx context.Context, tx *sql.DB) (domain.TaskDetail, error)
 }

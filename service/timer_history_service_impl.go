@@ -26,10 +26,6 @@ func NewTimerHistoryService(timerHistoryRepository repository.TimerHistoryReposi
 }
 
 func (service *TimerHistoryServiceImpl) FindByParentId(ctx context.Context, timerId int) web.RelationTimerHistoriesResponse {
-	// tx, err := service.DB.Begin()
-	// helper.PanifIfError(err)
-	// defer helper.CommitOrRollback(tx)
-
 	timer, err := service.TimerHistoryRepository.FindByParentId(ctx, service.DB, timerId)
 	if err != nil {
 		panic(exception.NewNotFoundError(err.Error()))
