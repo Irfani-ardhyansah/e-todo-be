@@ -60,9 +60,12 @@ func (repository *TimerHistoryRepositoryImpl) GetAll(ctx context.Context, db *sq
 	tasks := []domain.TaskDetail{}
 	for rows.Next() {
 		task := domain.TaskDetail{}
-		var timeString string
-		err := rows.Scan(&task.Id, &task.TaskName, &timeString, &task.Date)
+		var timeString, dateString string
+		err := rows.Scan(&task.Id, &task.TaskName, &timeString, &dateString)
 		task.Time = timeString
+		helper.PanifIfError(err)
+
+		task.Date, err = time.Parse("2006-01-02", dateString)
 		helper.PanifIfError(err)
 
 		tasks = append(tasks, task)

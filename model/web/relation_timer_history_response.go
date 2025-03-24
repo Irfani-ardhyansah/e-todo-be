@@ -9,3 +9,16 @@ type RelationTimerHistoriesResponse struct {
 	Status    string                `json:"status"`
 	Histories []domain.TimerHistory `json:"posts,omitempty"`
 }
+
+type WeeklyReportResponse struct {
+	StartDate  string              `json:"start_date"`
+	EndDate    string              `json:"end_date"`
+	TotalTime  string              `json:"total_time"`
+	DataDetail []domain.TaskDetail `json:"data_detail"`
+}
+type TaskDetailResponse struct {
+	Id       int    `json:"id"`
+	TaskName string `json:"task_name"`
+	Time     string `json:"time"`
+	Date     string `json:"date"`
+}

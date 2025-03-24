@@ -5,8 +5,11 @@ import (
 	"database/sql"
 	exception "e-todo/excception"
 	"e-todo/helper"
+	"e-todo/model/domain"
 	"e-todo/model/web"
 	"e-todo/repository"
+	"fmt"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -32,4 +35,74 @@ func (service *TimerHistoryServiceImpl) FindByParentId(ctx context.Context, time
 	}
 
 	return helper.ToRelationTimerHistoriesResponse(timer)
+}
+
+func (service *TimerHistoryServiceImpl) GetWeeklyReport(ctx context.Context) []web.WeeklyReportResponse {
+	tasks, err := service.TimerHistoryRepository.GetAll(ctx, service.DB)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
+
+	weeklyData := make(map[string][]domain.TaskDetail)
+
+	for _, task := range tasks {
+		startDate, endDate := getWeekRange(task.Date)
+		weekKey := fmt.Sprintf("%s - %s", startDate.Format("02-01-2006"), endDate.Format("02-01-2006"))
+		weeklyData[weekKey] = append(weeklyData[weekKey], task)
+	}
+
+	var reports []web.WeeklyReportResponse
+
+	for weekKey, tasks := range weeklyData {
+		var startDate, endDate string
+		fmt.Sscanf(weekKey, "%s - %s", &startDate, &endDate)
+
+		totalTime := calculateTotalTime(tasks)
+
+		reports = append(reports, web.WeeklyReportResponse{
+			StartDate:  startDate,
+			EndDate:    endDate,
+			TotalTime:  totalTime,
+			DataDetail: tasks,
+		})
+	}
+
+	return reports
+}
+
+func getWeekRange(date time.Time) (time.Time, time.Time) {
+	weekday := date.Weekday()
+	startDate := date.AddDate(0, 0, -int(weekday)+1)
+	endDate := date.AddDate(0, 0, 6)
+
+	return startDate, endDate
+}
+
+func calculateTotalTime(tasks []domain.TaskDetail) string {
+	var totalDuration time.Duration
+
+	for _, task := range tasks {
+		duration, err := parseTimeToDuration(task.Time)
+		if err != nil {
+			fmt.Println("Error parsing duration:", err)
+			continue
+		}
+		totalDuration += duration
+	}
+
+	hours := int(totalDuration.Hours())
+	minutes := int(totalDuration.Minutes()) % 60
+	seconds := int(totalDuration.Seconds()) % 60
+
+	return fmt.Sprintf("%02d:%02d:%02d", hours, minutes, seconds)
+}
+
+func parseTimeToDuration(timeStr string) (time.Duration, error) {
+	var hours, minutes, seconds int
+	_, err := fmt.Sscanf(timeStr, "%d:%d:%d", &hours, &minutes, &seconds)
+	if err != nil {
+		return 0, err
+	}
+
+	return time.Duration(hours)*time.Hour + time.Duration(minutes)*time.Minute + time.Duration(seconds)*time.Second, nil
 }

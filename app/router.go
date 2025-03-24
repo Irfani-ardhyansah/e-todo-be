@@ -51,6 +51,7 @@ func NewRouter(taskController controller.TaskController, timerController control
 	router.PUT("/api/v1/timer/update/:timerId", jwtMiddleware(timerController.Update))
 
 	router.GET("/api/v1/timer/history/:timerId", jwtMiddleware(timerHistoryController.ListByTimer))
+	router.GET("/api/v1/timer/weekly-report", jwtMiddleware(timerHistoryController.ListWeeklyReport))
 
 	router.POST("/api/v1/user/create", jwtMiddleware(userController.Create))
 

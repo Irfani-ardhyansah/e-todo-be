@@ -1,5 +1,7 @@
 package domain
 
+import "time"
+
 type TimerHistory struct {
 	Id        int
 	TimerId   int
@@ -20,7 +22,7 @@ type TaskDetail struct {
 	Id       int
 	TaskName string
 	Time     string
-	Date     string
+	Date     time.Time
 }
 
 type WeeklyReport struct {
