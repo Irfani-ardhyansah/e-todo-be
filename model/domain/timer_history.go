@@ -25,9 +25,13 @@ type TaskDetail struct {
 	Date     time.Time
 }
 
-type WeeklyReport struct {
-	StartDate  string
-	EndDate    string
-	TotalTime  string
-	DataDetail []TaskDetail
+type GroupedByDate struct {
+	Date         string
+	DataGroupded []TaskSummary
+}
+
+type TaskSummary struct {
+	Id       int
+	TaskName string
+	Time     string
 }

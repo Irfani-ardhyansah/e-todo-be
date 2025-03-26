@@ -59,15 +59,41 @@ func (service *TimerHistoryServiceImpl) GetWeeklyReport(ctx context.Context) []w
 
 		totalTime := calculateTotalTime(tasks)
 
+		groupedTaskByDate := groupTaskByDate(tasks)
+
 		reports = append(reports, web.WeeklyReportResponse{
 			StartDate:  startDate,
 			EndDate:    endDate,
 			TotalTime:  totalTime,
-			DataDetail: tasks,
+			DataDetail: groupedTaskByDate,
 		})
 	}
 
 	return reports
+}
+
+func groupTaskByDate(tasks []domain.TaskDetail) []domain.GroupedByDate {
+	grouped := make(map[string][]domain.TaskSummary)
+
+	for _, task := range tasks {
+		dateKey := task.Date.Format("2006-01-02")
+
+		grouped[dateKey] = append(grouped[dateKey], domain.TaskSummary{
+			Id:       task.Id,
+			TaskName: task.TaskName,
+			Time:     task.Time,
+		})
+	}
+
+	results := []domain.GroupedByDate{}
+	for date, tasks := range grouped {
+		results = append(results, domain.GroupedByDate{
+			Date:         date,
+			DataGroupded: tasks,
+		})
+	}
+
+	return results
 }
 
 func getWeekRange(date time.Time) (time.Time, time.Time) {
