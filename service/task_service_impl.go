@@ -35,9 +35,10 @@ func (service *TaskServiceImpl) Create(ctx context.Context, request web.TaskCrea
 	defer helper.CommitOrRollback(tx)
 
 	task := domain.Task{
-		Name:   request.Name,
-		Status: request.Status,
-		Code:   request.Code,
+		Name:        request.Name,
+		Status:      request.Status,
+		Code:        request.Code,
+		Description: request.Description,
 	}
 
 	task = service.TaskRepository.Save(ctx, tx, task)
@@ -61,6 +62,7 @@ func (service *TaskServiceImpl) Update(ctx context.Context, request web.TaskUpda
 	task.Name = request.Name
 	task.Status = request.Status
 	task.Code = request.Code
+	task.Description = request.Description
 	task = service.TaskRepository.Update(ctx, tx, task)
 	return helper.ToTaskResponse(task)
 }

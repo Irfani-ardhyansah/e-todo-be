@@ -52,7 +52,7 @@ func (repository *TimerHistoryRepositoryImpl) FindByParentId(ctx context.Context
 }
 
 func (repository *TimerHistoryRepositoryImpl) GetAll(ctx context.Context, db *sql.DB) ([]domain.TaskDetail, error) {
-	SQL := "SELECT tasks.id, name, timer, DATE(timers.created_at) as date FROM tasks JOIN timers ON tasks.id = timers.task_id ORDER BY timers.created_at ASC"
+	SQL := "SELECT tasks.id, name, timer, DATE(timers.created_at) as date FROM tasks JOIN timers ON tasks.id = timers.task_id ORDER BY timers.created_at DESC"
 	rows, err := db.QueryContext(ctx, SQL)
 	helper.PanifIfError(err)
 	defer rows.Close()
