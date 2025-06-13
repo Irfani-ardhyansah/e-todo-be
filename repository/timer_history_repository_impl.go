@@ -72,3 +72,25 @@ func (repository *TimerHistoryRepositoryImpl) GetAll(ctx context.Context, db *sq
 
 	return tasks, err
 }
+
+func (repository *TimerHistoryRepositoryImpl) GetByTaskId(ctx context.Context, db *sql.DB, taskId int) ([]domain.TaskDetail, error) {
+	SQL := "SELECT tasks.id, name, timer, DATE(timers.created_at) as date FROM tasks JOIN timers ON tasks.id = timers.task_id WHERE task_id = ? ORDER BY timers.created_at DESC"
+	rows, err := db.QueryContext(ctx, SQL, taskId)
+	helper.PanifIfError(err)
+	defer rows.Close()
+
+	tasks := []domain.TaskDetail{}
+	for rows.Next() {
+		task := domain.TaskDetail{}
+		var timeString, dateString string
+		err := rows.Scan(&task.Id, &task.TaskName, &timeString, &dateString)
+		task.Time = timeString
+		helper.PanifIfError(err)
+		task.Date, err = time.Parse("2006-01-02", dateString)
+		helper.PanifIfError(err)
+
+		tasks = append(tasks, task)
+	}
+
+	return tasks, err
+}

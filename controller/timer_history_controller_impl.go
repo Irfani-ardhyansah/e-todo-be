@@ -46,3 +46,19 @@ func (controller *TimerHistoryControllerImpl) ListWeeklyReport(writer http.Respo
 
 	helper.WriteToResponseBody(writer, webResponse)
 }
+
+func (controller *TimerHistoryControllerImpl) ListWeeklyReportByTaskId(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+
+	taskId := params.ByName("taskId")
+	id, err := strconv.Atoi(taskId)
+	helper.PanifIfError(err)
+
+	weeklyReportResponse := controller.TimerHistoryService.GetWeeklyReportByTaskId(request.Context(), id)
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   weeklyReportResponse,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}
