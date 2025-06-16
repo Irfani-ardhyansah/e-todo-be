@@ -63,3 +63,23 @@ func ToUserLoginResponse(user domain.User) web.UserLoginResponse {
 		RefreshToken: user.RefreshToken,
 	}
 }
+
+func ToCommentResponse(comment domain.Comment) web.CommentResponse {
+	return web.CommentResponse{
+		Id:        comment.Id,
+		TaskId:    comment.TaskId,
+		UserId:    comment.UserId,
+		ParentId:  comment.ParentId,
+		Comment:   comment.Comment,
+		CreatedAt: comment.CreatedAt,
+	}
+}
+
+func ToCommentResponses(comments []domain.Comment) []web.CommentResponse {
+	var commentResponses []web.CommentResponse
+	for _, comment := range comments {
+		commentResponses = append(commentResponses, ToCommentResponse(comment))
+	}
+
+	return commentResponses
+}

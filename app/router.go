@@ -38,14 +38,20 @@ func jwtMiddleware(next httprouter.Handle) httprouter.Handle {
 	}
 }
 
-func NewRouter(taskController controller.TaskController, timerController controller.TimerController, timerHistoryController controller.TimerHistoryController, userController controller.UserController, authController controller.AuthController) *httprouter.Router {
+func NewRouter(taskController controller.TaskController, timerController controller.TimerController, timerHistoryController controller.TimerHistoryController, userController controller.UserController, authController controller.AuthController, commentController controller.CommentController) *httprouter.Router {
 	router := httprouter.New()
 	router.GET("/api/v1/tasks", jwtMiddleware(taskController.FindAll))
 	router.GET("/api/v1/task/:taskId", jwtMiddleware(taskController.FindById))
 	router.POST("/api/v1/task", jwtMiddleware(taskController.Create))
 	router.PUT("/api/v1/task/:taskId", jwtMiddleware(taskController.Update))
-	router.PUT("/api/v1/task-status/:taskId", jwtMiddleware(taskController.UpdateStatus))
+	router.PUT("/api/v1/task/:taskId/status", jwtMiddleware(taskController.UpdateStatus))
 	router.DELETE("/api/v1/task/:taskId", jwtMiddleware(taskController.Delete))
+
+	router.GET("/api/v1/task/:taskId/comments", jwtMiddleware(commentController.FindAll))
+	router.GET("/api/v1/task/:taskId/comments/:commentId", jwtMiddleware(commentController.FindById))
+	router.POST("/api/v1/task/:taskId/comments", jwtMiddleware(commentController.Create))
+	router.PUT("/api/v1/task/:taskId/comments/:commentId", jwtMiddleware(commentController.Update))
+	router.DELETE("/api/v1/task/:taskId/comments", jwtMiddleware(commentController.Delete))
 
 	router.POST("/api/v1/timer/start/:taskId", jwtMiddleware(timerController.Create))
 	router.PUT("/api/v1/timer/update/:timerId", jwtMiddleware(timerController.Update))

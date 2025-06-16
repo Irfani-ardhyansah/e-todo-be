@@ -33,11 +33,15 @@ func main() {
 	userService := service.NewUserService(userRepository, db, validate)
 	userController := controller.NewUserController(userService)
 
+	commentRepository := repository.NewCommentRepository()
+	commentService := service.NewCommentService(commentRepository, db, validate)
+	commentController := controller.NewCommentController(commentService)
+
 	authRespository := repository.NewAuthRepository()
 	authService := service.NewAuthService(authRespository, userRepository, db, validate)
 	authController := controller.NewAuthController(authService)
 
-	router := app.NewRouter(taskController, timerController, timerHistoryController, userController, authController)
+	router := app.NewRouter(taskController, timerController, timerHistoryController, userController, authController, commentController)
 
 	corsHandler := cors.New(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:3000"}, // Change this to your frontend URL
