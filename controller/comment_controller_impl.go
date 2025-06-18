@@ -36,19 +36,19 @@ func (controller *CommentControllerImpl) Create(writer http.ResponseWriter, requ
 }
 
 func (controller *CommentControllerImpl) Update(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	taskUpdateRequest := web.CommentUpdateRequest{}
-	helper.ReadFromRequestBody(request, &taskUpdateRequest)
+	commentUpdateRequest := web.CommentUpdateRequest{}
+	helper.ReadFromRequestBody(request, &commentUpdateRequest)
 
 	taskId := params.ByName("taskId")
 	id, err := strconv.Atoi(taskId)
 	helper.PanifIfError(err)
 
-	taskUpdateRequest.Id = id
-	taskResponse := controller.CommentService.Update(request.Context(), taskUpdateRequest)
+	commentUpdateRequest.Id = id
+	commentResponse := controller.CommentService.Update(request.Context(), commentUpdateRequest)
 	webResponse := web.WebResponse{
 		Code:   200,
 		Status: "OK",
-		Data:   taskResponse,
+		Data:   commentResponse,
 	}
 
 	helper.WriteToResponseBody(writer, webResponse)
@@ -84,7 +84,11 @@ func (controller *CommentControllerImpl) FindById(writer http.ResponseWriter, re
 }
 
 func (controller *CommentControllerImpl) FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	taskResponses := controller.CommentService.FindAll(request.Context())
+	taskId := params.ByName("taskId")
+	id, err := strconv.Atoi(taskId)
+	helper.PanifIfError(err)
+
+	taskResponses := controller.CommentService.FindAll(request.Context(), id)
 	webResponse := web.WebResponse{
 		Code:   200,
 		Status: "OK",

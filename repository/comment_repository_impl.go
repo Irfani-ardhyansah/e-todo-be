@@ -6,6 +6,7 @@ import (
 	"e-todo/helper"
 	"e-todo/model/domain"
 	"errors"
+	"time"
 )
 
 type CommentRepositoryImpl struct{}
@@ -15,8 +16,9 @@ func NewCommentRepository() CommentRepository {
 }
 
 func (repository *CommentRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, comment domain.Comment) domain.Comment {
-	SQL := "INSERT INTO comments(task_id, user_id, parent_id, comment) values(?, ?, ?, ?)"
-	result, err := tx.ExecContext(ctx, SQL, comment.TaskId, comment.UserId, comment.ParentId, comment.Comment)
+	createdAt := time.Now()
+	SQL := "INSERT INTO comments(task_id, user_id, parent_id, comment, created_at) values(?, ?, ?, ?, ?)"
+	result, err := tx.ExecContext(ctx, SQL, comment.TaskId, comment.UserId, comment.ParentId, comment.Comment, createdAt)
 	helper.PanifIfError(err)
 
 	id, err := result.LastInsertId()
@@ -56,17 +58,32 @@ func (repository *CommentRepositoryImpl) FindById(ctx context.Context, tx *sql.T
 	}
 }
 
-func (repository *CommentRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.Comment {
-	SQL := "SELECT id, task_id, user_id, parent_id, comment, created_at FROM comments"
-	rows, err := tx.QueryContext(ctx, SQL)
+func (repository *CommentRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx, taskId int) []domain.Comment {
+	SQL := "SELECT id, task_id, user_id, parent_id, comment, created_at FROM comments WHERE task_id = ?"
+	rows, err := tx.QueryContext(ctx, SQL, taskId)
 	helper.PanifIfError(err)
 	defer rows.Close()
 
 	var comments []domain.Comment
 	for rows.Next() {
 		comment := domain.Comment{}
-		err := rows.Scan(&comment.Id, &comment.TaskId, &comment.UserId, &comment.ParentId, &comment.Comment, &comment.CreatedAt)
+		var parentId sql.NullInt64
+
+		err := rows.Scan(
+			&comment.Id,
+			&comment.TaskId,
+			&comment.UserId,
+			&parentId,
+			&comment.Comment,
+			&comment.CreatedAt)
 		helper.PanifIfError(err)
+
+		comment.ParentId = nil
+		if parentId.Valid {
+			val := int(parentId.Int64)
+			comment.ParentId = &val
+		}
+
 		comments = append(comments, comment)
 	}
 

@@ -90,11 +90,43 @@ func (service *CommentServiceImpl) FindById(ctx context.Context, commentId int) 
 	return helper.ToCommentResponse(comment)
 }
 
-func (service *CommentServiceImpl) FindAll(ctx context.Context) []web.CommentResponse {
+func (service *CommentServiceImpl) FindAll(ctx context.Context, taskId int) []web.CommentResponse {
 	tx, err := service.DB.Begin()
 	helper.PanifIfError(err)
 	defer helper.CommitOrRollback(tx)
-	comments := service.CommentRepository.FindAll(ctx, tx)
 
-	return helper.ToCommentResponses(comments)
+	comments := service.CommentRepository.FindAll(ctx, tx, taskId)
+	commentMap := make(map[int]*web.CommentResponse)
+
+	var roots []*web.CommentResponse
+
+	for _, c := range comments {
+		commentMap[c.Id] = &web.CommentResponse{
+			Id:        c.Id,
+			TaskId:    c.TaskId,
+			UserId:    c.UserId,
+			ParentId:  c.ParentId,
+			Comment:   c.Comment,
+			CreatedAt: c.CreatedAt,
+			Childs:    []web.CommentResponse{},
+		}
+	}
+
+	for _, c := range comments {
+		if c.ParentId == nil {
+			roots = append(roots, commentMap[c.Id])
+		} else {
+			parent := commentMap[*c.ParentId]
+			if parent != nil {
+				parent.Childs = append(parent.Childs, *commentMap[c.Id])
+			}
+		}
+	}
+
+	var finalRoots []web.CommentResponse
+	for _, r := range roots {
+		finalRoots = append(finalRoots, *r)
+	}
+
+	return finalRoots
 }

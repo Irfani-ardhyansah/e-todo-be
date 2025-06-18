@@ -10,5 +10,5 @@ type CommentService interface {
 	Update(ctx context.Context, task web.CommentUpdateRequest) web.CommentResponse
 	Delete(ctx context.Context, commentId int)
 	FindById(ctx context.Context, commentId int) web.CommentResponse
-	FindAll(ctx context.Context) []web.CommentResponse
+	FindAll(ctx context.Context, taskId int) []web.CommentResponse
 }

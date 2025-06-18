@@ -11,5 +11,5 @@ type CommentRepository interface {
 	Update(ctx context.Context, tx *sql.Tx, Comment domain.Comment) domain.Comment
 	Delete(ctx context.Context, tx *sql.Tx, Comment domain.Comment)
 	FindById(ctx context.Context, tx *sql.Tx, commentId int) (domain.Comment, error)
-	FindAll(ctx context.Context, tx *sql.Tx) []domain.Comment
+	FindAll(ctx context.Context, tx *sql.Tx, taskId int) []domain.Comment
 }
