@@ -102,11 +102,15 @@ func (service *CommentServiceImpl) FindAll(ctx context.Context, taskId int) []we
 
 	for _, c := range comments {
 		commentMap[c.Id] = &web.CommentResponse{
-			Id:        c.Id,
-			TaskId:    c.TaskId,
-			UserId:    c.UserId,
-			ParentId:  c.ParentId,
-			Comment:   c.Comment,
+			Id:       c.Id,
+			TaskId:   c.TaskId,
+			UserId:   c.UserId,
+			ParentId: c.ParentId,
+			Comment:  c.Comment,
+			User: web.CommentUserResponse{
+				Id:   c.UserId,
+				Name: c.UserName,
+			},
 			CreatedAt: c.CreatedAt,
 			Childs:    []*web.CommentResponse{},
 		}

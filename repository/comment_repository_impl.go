@@ -59,7 +59,16 @@ func (repository *CommentRepositoryImpl) FindById(ctx context.Context, tx *sql.T
 }
 
 func (repository *CommentRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx, taskId int) []domain.Comment {
-	SQL := "SELECT id, task_id, user_id, parent_id, comment, created_at FROM comments WHERE task_id = ?"
+	SQL := `
+	SELECT 
+		c.id, c.task_id, c.user_id, c.parent_id, c.comment, c.created_at, u.name
+	FROM 
+		comments c 
+	JOIN 
+		users u ON c.user_id = u.id
+	WHERE 
+		task_id = ?`
+
 	rows, err := tx.QueryContext(ctx, SQL, taskId)
 	helper.PanifIfError(err)
 	defer rows.Close()
@@ -75,7 +84,8 @@ func (repository *CommentRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx
 			&comment.UserId,
 			&parentId,
 			&comment.Comment,
-			&comment.CreatedAt)
+			&comment.CreatedAt,
+			&comment.UserName)
 		helper.PanifIfError(err)
 
 		comment.ParentId = nil

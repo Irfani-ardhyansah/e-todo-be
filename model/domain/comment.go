@@ -8,4 +8,5 @@ type Comment struct {
 	Comment   string
 	CreatedAt string
 	UpdatedAt string
+	UserName  string
 }
