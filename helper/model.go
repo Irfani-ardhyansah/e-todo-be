@@ -59,6 +59,7 @@ func ToUserLoginResponse(user domain.User) web.UserLoginResponse {
 	return web.UserLoginResponse{
 		Id:           user.Id,
 		Email:        user.Email,
+		Name:         user.Name,
 		AccessToken:  user.AccessToken,
 		RefreshToken: user.RefreshToken,
 	}

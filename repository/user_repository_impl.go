@@ -31,14 +31,14 @@ func (repository *UserRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, user
 }
 
 func (repository *UserRepositoryImpl) FindByEmail(ctx context.Context, db *sql.DB, email string) (domain.User, error) {
-	SQL := "SELECT id, email, password FROM users WHERE email = ?"
+	SQL := "SELECT id, email, name, password FROM users WHERE email = ?"
 	rows, err := db.Query(SQL, email)
 	helper.PanifIfError(err)
 	defer rows.Close()
 
 	user := domain.User{}
 	if rows.Next() {
-		err := rows.Scan(&user.Id, &user.Email, &user.Password)
+		err := rows.Scan(&user.Id, &user.Email, &user.Name, &user.Password)
 		helper.PanifIfError(err)
 		return user, nil
 	} else {
@@ -47,14 +47,14 @@ func (repository *UserRepositoryImpl) FindByEmail(ctx context.Context, db *sql.D
 }
 
 func (repository *UserRepositoryImpl) FindById(ctx context.Context, db *sql.DB, userId int) (domain.User, error) {
-	SQL := "SELECT id, email, password FROM users WHERE id = ?"
+	SQL := "SELECT id, email, name, password FROM users WHERE id = ?"
 	rows, err := db.Query(SQL, userId)
 	helper.PanifIfError(err)
 	defer rows.Close()
 
 	user := domain.User{}
 	if rows.Next() {
-		err := rows.Scan(&user.Id, &user.Email, &user.Password)
+		err := rows.Scan(&user.Id, &user.Email, &user.Name, &user.Password)
 		helper.PanifIfError(err)
 		return user, nil
 	} else {
