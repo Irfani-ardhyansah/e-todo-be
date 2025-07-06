@@ -108,7 +108,7 @@ func (service *CommentServiceImpl) FindAll(ctx context.Context, taskId int) []we
 			ParentId:  c.ParentId,
 			Comment:   c.Comment,
 			CreatedAt: c.CreatedAt,
-			Childs:    []web.CommentResponse{},
+			Childs:    []*web.CommentResponse{},
 		}
 	}
 
@@ -118,7 +118,7 @@ func (service *CommentServiceImpl) FindAll(ctx context.Context, taskId int) []we
 		} else {
 			parent := commentMap[*c.ParentId]
 			if parent != nil {
-				parent.Childs = append(parent.Childs, *commentMap[c.Id])
+				parent.Childs = append(parent.Childs, commentMap[c.Id])
 			}
 		}
 	}
