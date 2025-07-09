@@ -8,6 +8,7 @@ import (
 func ToTaskResponse(task domain.Task) web.TaskResponse {
 	return web.TaskResponse{
 		Id:          task.Id,
+		UserId:      task.UserId,
 		Name:        task.Name,
 		Status:      task.Status,
 		Description: task.Description,

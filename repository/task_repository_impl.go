@@ -61,7 +61,7 @@ func (repository *TaskRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, 
 }
 
 func (repository *TaskRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.Task {
-	SQL := "SELECT id, name, status, code, description, created_at FROM tasks"
+	SQL := "SELECT id, user_id, name, status, code, description, created_at FROM tasks"
 	rows, err := tx.QueryContext(ctx, SQL)
 	helper.PanifIfError(err)
 	defer rows.Close()
@@ -69,7 +69,7 @@ func (repository *TaskRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) [
 	var tasks []domain.Task
 	for rows.Next() {
 		task := domain.Task{}
-		err := rows.Scan(&task.Id, &task.Name, &task.Status, &task.Code, &task.Description, &task.CreatedAt)
+		err := rows.Scan(&task.Id, &task.UserId, &task.Name, &task.Status, &task.Code, &task.Description, &task.CreatedAt)
 		helper.PanifIfError(err)
 		tasks = append(tasks, task)
 	}
