@@ -29,7 +29,7 @@ func (repository *CommentRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, c
 }
 
 func (repository *CommentRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, comment domain.Comment) domain.Comment {
-	SQL := "UPDATE comments SET comment = ?, WHERE id = ?"
+	SQL := "UPDATE comments SET comment = ? WHERE id = ?"
 	_, err := tx.ExecContext(ctx, SQL, comment.Comment, comment.Id)
 	helper.PanifIfError(err)
 

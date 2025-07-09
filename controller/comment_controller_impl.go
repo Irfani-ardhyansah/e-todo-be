@@ -39,7 +39,7 @@ func (controller *CommentControllerImpl) Update(writer http.ResponseWriter, requ
 	commentUpdateRequest := web.CommentUpdateRequest{}
 	helper.ReadFromRequestBody(request, &commentUpdateRequest)
 
-	taskId := params.ByName("taskId")
+	taskId := params.ByName("commentId")
 	id, err := strconv.Atoi(taskId)
 	helper.PanifIfError(err)
 
@@ -55,7 +55,7 @@ func (controller *CommentControllerImpl) Update(writer http.ResponseWriter, requ
 }
 
 func (controller *CommentControllerImpl) Delete(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	taskId := params.ByName("taskId")
+	taskId := params.ByName("commentId")
 	id, err := strconv.Atoi(taskId)
 	helper.PanifIfError(err)
 
@@ -69,7 +69,7 @@ func (controller *CommentControllerImpl) Delete(writer http.ResponseWriter, requ
 }
 
 func (controller *CommentControllerImpl) FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	taskId := params.ByName("taskId")
+	taskId := params.ByName("commentId")
 	id, err := strconv.Atoi(taskId)
 	helper.PanifIfError(err)
 
